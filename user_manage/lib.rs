@@ -1,14 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use ink_lang as ink;
-
 #[brush::contract]
 mod user_manage {
 
-    use brush::{
-        modifiers,
-        traits::InkStorage,
-    };
+    use brush::modifiers;
     use ownable::traits::*;
 
     use ink_storage::collections::{
@@ -70,7 +65,7 @@ mod user_manage {
                     self.total_users += 1;
                     vacant.insert(_user);
                 },
-                Entry::Occupied(occupied) => {
+                Entry::Occupied(mut occupied) => {
                     occupied.insert(_user);
                 },
             }
@@ -79,8 +74,9 @@ mod user_manage {
 
         #[ink(message)]
         #[modifiers(only_owner)]
-        pub fn set_manager(&mut self, _user: AccountId, _is_manager: bool) {
+        pub fn set_manager(&mut self, _user: AccountId, _is_manager: bool) -> Result<(), OwnableError> {
             self.managers.insert(_user, _is_manager);
+            Ok(())
         }
 
         #[ink(message)]
