@@ -1,5 +1,5 @@
 [package]
-name = "user_manage"
+name = "nft_factory"
 version = "0.1.0"
 authors = ["[your_name] <[your_email]>"]
 edition = "2018"
@@ -17,15 +17,17 @@ scale = { package = "parity-scale-codec", version = "2", default-features = fals
 scale-info = { version = "1", default-features = false, features = ["derive"], optional = true }
 
 # These dependencies
-ownable = { git = "https://github.com/Supercolony-net/openbrush-contracts", default-features = false }
+psp1155 = { git = "https://github.com/Supercolony-net/openbrush-contracts", default-features = false }
 brush = { git = "https://github.com/Supercolony-net/openbrush-contracts", default-features = false }
 
 [lib]
-name = "user_manage"
+name = "nft_factory"
 path = "lib.rs"
 crate-type = [
 	# Used for normal contract Wasm blobs.
 	"cdylib",
+	# Used for ABI generation.
+	"rlib",
 ]
 
 [features]
@@ -40,7 +42,7 @@ std = [
     "ink_prelude/std",
 
     # These dependencies
-    "ownable/std",
+    "psp1155/std",
     "brush/std",
 ]
 ink-as-dependency = []
