@@ -1,59 +1,88 @@
 const { Seaport } = require("@opensea/seaport-js");
 const axios = require("axios");
+const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { BigNumber } = ethers;
+const { privKey01, privKey02 } = require("../setting.js");
 
 const UD_ABI = require("./ABI/ud_abi.json");
 const UD_ADDRESS = "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f";
-const SEA_ABI = require("./ABI/seaport_abi.json");
+const UD_TOKEN_ID =
+  "10972960335751688875393978132030640555815094700642329234937142627564682509899";
 const SEA_ADDRESS = "0x00000000006c3852cbef3e08e8df289169ede581";
 const WETH_ADDRESS = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
 
-const userAddress = "0xF880E7cd6eE8423fd4954379977c73a474A71842";
-const theThirdAddr = "0xE9c273E205dd99C1C2Eea66f0cb7655cDFB1AE41";
+const feeAddr = "0x0000a26b00c1F0DF003000390027140000fAa719";
+const conduitKey =
+  "0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000";
+const provider = ethers.provider;
 
-// 全局账户、合约对象
-let signer;
+// 全局变量
+let seller;
+let buyer;
 let seaport;
-let UD;
-let SEA;
 let signOrderInfo;
+let udContract;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function printBalances(sellerAddr, buyerAddr) {
+  // domain balances
+  const balance1 = await udContract.balanceOf(sellerAddr);
+  console.log("\nseller's domain balance:", balance1);
+  const balance2 = await udContract.balanceOf(buyerAddr);
+  console.log("buyer's domain balance:", balance2);
+  return [balance1, balance2];
+}
 
 describe("Seaport main interfaces", function () {
   beforeEach(async function () {
+    // 合约实例
+    udContract = new ethers.Contract(UD_ADDRESS, UD_ABI, provider);
+
+    // seller and buyer wallet
+    seller = new ethers.Wallet(privKey01, provider);
+    buyer = new ethers.Wallet(privKey02, provider);
+    seaport = new Seaport(seller);
+
+    // order info
     order = {
-      offerer: userAddress,
+      offerer: seller.address,
       offer: [
         {
           itemType: 2,
           token: UD_ADDRESS,
-          identifierOrCriteria:
-            "10972960335751688875393978132030640555815094700642329234937142627564682509899",
+          identifierOrCriteria: UD_TOKEN_ID,
           startAmount: "1",
           endAmount: "1",
         },
       ],
       consideration: [
         {
-          // itemType: 0,
-          // token: "0x0000000000000000000000000000000000000000",
-          itemType: 1,
-          token: WETH_ADDRESS,
+          itemType: 0,
+          token: "0x0000000000000000000000000000000000000000",
+          startAmount: "97500000000000000", // 0.1 matic (97.5%)
+          endAmount: "97500000000000000",
+          // itemType: 1,
+          // token: WETH_ADDRESS,
+          // startAmount: "97500000000000", // 0.0001 WETH (97.5%)
+          // endAmount: "97500000000000",
           identifierOrCriteria: "0",
-          startAmount: "9750000000000000",
-          endAmount: "9750000000000000",
-          recipient: userAddress,
+          recipient: seller.address,
         },
         {
-          // itemType: 0,
-          // token: "0x0000000000000000000000000000000000000000",
-          itemType: 1,
-          token: WETH_ADDRESS,
+          itemType: 0,
+          token: "0x0000000000000000000000000000000000000000",
+          startAmount: "2500000000000000", // 0.1 matic (2.5%)
+          endAmount: "2500000000000000",
+          // itemType: 1,
+          // token: WETH_ADDRESS,
+          // startAmount: "2500000000000", // 0.0001 WETH (2.5%)
+          // endAmount: "2500000000000",
           identifierOrCriteria: "0",
-          startAmount: "250000000000000",
-          endAmount: "250000000000000",
-          recipient: "0x0000a26b00c1F0DF003000390027140000fAa719",
-          // recipient: theThirdAddr,
+          recipient: feeAddr,
         },
       ],
       startTime: Math.floor(Date.now() / 1000).toString(),
@@ -64,33 +93,17 @@ describe("Seaport main interfaces", function () {
       zoneHash:
         "0x0000000000000000000000000000000000000000000000000000000000000000",
       salt: Math.floor(Math.random() * 10 ** 10).toString(),
-      conduitKey:
-        "0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000",
+      conduitKey,
       counter: 0,
     };
-
-    // default network: matic
-    const provider = ethers.provider;
-    UD = new ethers.Contract(UD_ADDRESS, UD_ABI, provider);
-    SEA = new ethers.Contract(SEA_ADDRESS, SEA_ABI, provider);
-
-    // seller
-    signer = new ethers.Wallet(
-      "c2c2baa320e652038e3a6a003a75e28c10bb77d98785edb40ecc2c55af6a6e3b",
-      provider
-    );
-    seaport = new Seaport(signer);
-
-    signOrderInfo = await seaport.signOrder(order, 0, userAddress);
-    console.log("sign order info: ", signOrderInfo);
+    // sign for order
+    signOrderInfo = await seaport.signOrder(order, 0, seller.address);
   });
 
-  it("get balance", async () => {
-    const myBalance = await UD.balanceOf(userAddress);
-    console.log("my balance: ", myBalance);
-  });
+  it("listing on opensea by `seller` and fulfill order by `buyer`", async () => {
+    // pre balances status
+    const balancesBefore = await printBalances(seller.address, buyer.address);
 
-  it("listing on opensea(order.consideration[1] must be opensea's addr and the handling fee must be 2.5%", async () => {
     const url = "https://api.opensea.io/v2/orders/matic/seaport/listings";
     const cHeaders = {
       Accept: "application/json",
@@ -101,18 +114,45 @@ describe("Seaport main interfaces", function () {
       parameters: order,
       signature: signOrderInfo,
     };
-    await axios
-      .post(url, data, { headers: cHeaders })
-      // .then(response => response.json())
-      .catch((err) => {
-        // console.log(err);
-        if (err.response) {
-          console.log(err.response.data);
-          console.log(err.response.status);
-          console.log(err.response.headers);
-        } else {
-          console.log("Error: ", err.message);
-        }
-      });
+    console.log("\norder info:\n", JSON.stringify(data, null, 2));
+
+    await axios.post(url, data, { headers: cHeaders }).catch((err) => {
+      if (err.response) {
+        console.log(err.response.data);
+        console.log(err.response.status);
+        console.log(err.response.headers);
+      } else {
+        console.log("Error: ", err.message);
+      }
+    });
+
+    await sleep(3000);
+    console.log("\n\n上架成功");
+
+    // change seaport signer from `seller` to `buyer`, cause fulfilling order needs buyer's signature.
+    seaport.signer = buyer;
+    const { actions } = await seaport.fulfillOrder({
+      order: data,
+      accountAddress: buyer.address,
+      conduitKey,
+    });
+
+    // console.log("\nactions length:\n", actions.length);
+    expect(actions.length).to.be.equal(1);
+    const action = actions[0];
+    let price = await provider.getGasPrice();
+    console.log("当前gas价格: ", price, "wei");
+    let options = {
+      gasPrice: price,
+      // gasLimit: 1300000,
+    };
+    const transaction = await action.transactionMethods.transact(options);
+    const receipt = await transaction.wait();
+    console.log("\ntxHash:", receipt.transactionHash);
+
+    // balances status after tx
+    const balancesAfter = await printBalances(seller.address, buyer.address);
+    console.log("\n卖家域名减少:", balancesBefore[0] - balancesAfter[0]);
+    console.log("买家域名增加:", balancesAfter[1] - balancesBefore[1]);
   });
 });
