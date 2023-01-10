@@ -41,8 +41,6 @@ async function printBalances(sellerAddr, buyerAddr) {
 function getConsiderationFulfillments(orders) {
   const offerMaticObj = {};
   const offerWETHObj = {};
-  const takerMaticObj = {};
-  const takerWETHObj = {};
   const offerMaticSet = new Set();
   const offerWETHSet = new Set();
   const ordersCoin = []; // 0 for Matic, 1 for WETH
@@ -92,6 +90,8 @@ function getConsiderationFulfillments(orders) {
       }
     }
   }
+
+  // 确定taker地址最终对应的fulfillments子数组
 
   const offerersMatic = Array.from(offerMaticSet);
   const offerersWETH = Array.from(offerWETHSet);
