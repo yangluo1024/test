@@ -4,6 +4,7 @@ coverage
 coverage.json
 typechain
 typechain-types
+setting.js
 
 # Hardhat files
 cache
