@@ -17,7 +17,7 @@ let buyer;
 
 function getConsiderationFulfillments(orders) {
   // 确定offerer收款地址最终对应的fulfillments子数组 (offerer收款详细对应的是consideration列表第一条目)
-  const [offererMaticObj, offererWETHObj] = confirmOfferFulfillments(orders, 0);
+  const [offererMaticObj, offererWETHObj] = confirmOfferFulfillments(orders);
   // 确定opensea收手续费地址最终对应的fulfillments子数组 (offerer收款详细对应的是consideration列表第二条目)
   const recipientObj = confirmOtherFulfillments(orders, 1);
   // 确定商品指定接收地址taker最终对应的fulfillments子数组 (offerer收款详细对应的是consideration列表第三条目)
