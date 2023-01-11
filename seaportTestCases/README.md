@@ -19,3 +19,4 @@
 
 其中customised开头的脚本，代表自定义手续费地址，opensea开头的脚本是在opensea直接上架和购买，batch-orders-params-algorithm.js 是提供给前端的批量购买参数算法
 
+customised-bid-xxx代表bid，customised-listing-xxx代表上架
