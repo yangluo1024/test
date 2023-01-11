@@ -7,17 +7,18 @@ const { privKey01, privKey02 } = require("../setting.js");
 
 const UD_ABI = require("./ABI/ud_abi.json");
 const UD_ADDRESS = "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f";
-const UD_TOKEN_ID =
-  "10972960335751688875393978132030640555815094700642329234937142627564682509899";
 const SEA_ADDRESS = "0x00000000006c3852cbef3e08e8df289169ede581";
 const WETH_ADDRESS = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
-
-const feeAddr = "0x0000a26b00c1F0DF003000390027140000fAa719";
 const conduitKey =
   "0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000";
 const provider = ethers.provider;
 
+const UD_TOKEN_ID =
+  "33651723785549494707706199451737364537114120588167476828772376849918637234177";
+const feeAddr = "0x0000a26b00c1F0DF003000390027140000fAa719";
+
 // 全局变量
+let order;
 let seller;
 let buyer;
 let seaport;
@@ -140,12 +141,11 @@ describe("Seaport main interfaces", function () {
     // console.log("\nactions length:\n", actions.length);
     expect(actions.length).to.be.equal(1);
     const action = actions[0];
-    let price = await provider.getGasPrice();
+    const price = await provider.getGasPrice();
     console.log("当前gas价格: ", price, "wei");
-    let options = {
-      gasPrice: price,
-      // gasLimit: 1300000,
-    };
+    const options = { gasPrice: price.mul(12).div(10) }; // 防止失败，gasPrice = currentGasPrice * 1.2
+
+    // 发送交易
     const transaction = await action.transactionMethods.transact(options);
     const receipt = await transaction.wait();
     console.log("\ntxHash:", receipt.transactionHash);
