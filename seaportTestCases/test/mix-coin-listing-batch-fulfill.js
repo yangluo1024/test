@@ -190,7 +190,7 @@ describe("Seaport main interfaces", function () {
     ];
   });
 
-  it("不同卖家不同币种上架多个商品，被buyer混合支付批量购买", async () => {
+  it("卖家不同币种上架多个商品，被buyer混合支付批量购买", async () => {
     // 交易前buyer和feeAddr的weth余额，以及seller和buyer的域名数
     const balancesBefore = await printBalances(
       seller.address,
