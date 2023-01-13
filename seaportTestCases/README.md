@@ -4,19 +4,21 @@
    npm i
    ```
 
-2. 设置测试地址私钥，打开setting.js， 填上卖家和买家的私钥
-
-   const privKey01 = ""
-   const privKey02 = ""
-
 3. 设置UD_TOKEN_ID和手续费接收地址feeAddr
 
-   const UD_TOKEN_ID = "33651723785549494707706199451737364537114120588167476828772376849918637234177";  
+   const mockAddress = "0xAa7739805C133F6eF0275638b3412af76F51777A";  
    
-   const feeAddr = "0xE9c273E205dd99C1C2Eea66f0cb7655cDFB1AE41";
+   const UD_TOKEN_ID = "33651723785549494707706199451737364537114120588167476828772376849918637234177";
+   
+   如果涉及weth支付订单，确保mockAddress地址中的实际weth余额大于0.0003(批量支付时需要付0.0002)
+   
+3. 设置好后，运行以下命令进行测试
 
-设置好后，运行npx hardhat test test/xxxx.js
+   ```cmd
+   # 启动本地节点
+   npx hardhat node --fork https://rpc.ankr.com/polygon --hostname 0.0.0.0
+   # 运行设置好的测试脚本
+   npx hardhat test test/xxx.js --network localhost
+   ```
 
-其中customised开头的脚本，代表自定义手续费地址，opensea开头的脚本是在opensea直接上架和购买，batch-orders-params-algorithm.js 是提供给前端的批量购买参数算法
-
-customised-bid-xxx代表bid，customised-listing-xxx代表上架
+   
