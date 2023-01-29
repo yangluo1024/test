@@ -133,10 +133,10 @@ describe("Seaport main interfaces", function () {
     const receipt = await tx.wait();
     await network.provider.send("evm_increaseTime", [60]);
     await network.provider.send("evm_mine");
-    console.log("\n购买域名交易哈希:", receipt.transactionHash);
+    console.log("\n取消上架交易哈希:", receipt.transactionHash);
 
     // 取消后seller和buyer的域名数变化验证, 并打印取消交易手续费
-    // balancesBefore / balancesAfter: [sellerDomainNum, buyerDomainNum, sellerBalance]
+    // balancesBefore / balancesAfter: [sellerDomainNum, buyerDomainNum, buyerBalance]
     const balancesAfter = await printBalances(
       seller.address,
       buyer.address,

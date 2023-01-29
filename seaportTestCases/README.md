@@ -4,7 +4,7 @@
    npm i
    ```
 
-3. 设置需要mock的地址及该地址下的UD_TOKEN_ID
+2. 设置需要mock的地址及该地址下的UD_TOKEN_ID
 
    const mockAddress = "0xAa7739805C133F6eF0275638b3412af76F51777A";  
    

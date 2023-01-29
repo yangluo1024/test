@@ -41,7 +41,7 @@ let orderAmount2;
 let handlingFee2;
 let mockAddrBalance;
 
-// 打印seller和buyer的域名数, 以及buyer和feeer的weth
+// 打印seller和buyer的域名数, 以及buyer和feeer的weth及matic
 async function printBalances(sellerAddr, buyerAddr, feeAddr) {
   const sellerDomainNum = await udContract.balanceOf(sellerAddr);
   console.log("seller域名数:", sellerDomainNum);
@@ -90,7 +90,7 @@ describe("Seaport main interfaces", function () {
     mockAddrBalance = await wethContract.connect(signer).balanceOf(mockAddress);
     await wethContract.connect(signer).transfer(buyer.address, mockAddrBalance);
 
-    // 跳转区块，模拟60秒后的链状态
+    // 跳转区块，模拟100秒后的链状态
     await network.provider.send("evm_increaseTime", [100]);
     await network.provider.send("evm_mine");
 
@@ -191,7 +191,7 @@ describe("Seaport main interfaces", function () {
   });
 
   it("卖家不同币种上架多个商品，被buyer混合支付批量购买", async () => {
-    // 交易前buyer和feeAddr的weth余额，以及seller和buyer的域名数
+    // 交易前buyer和feeAddr的weth,matic余额，以及seller和buyer的域名数
     const balancesBefore = await printBalances(
       seller.address,
       buyer.address,
