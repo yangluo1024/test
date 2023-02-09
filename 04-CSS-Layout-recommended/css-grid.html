@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Grid</title>
+    <style>
+      .el--1 {
+        background-color: blueviolet;
+      }
+      .el--2 {
+        background-color: orangered;
+      }
+      .el--3 {
+        background-color: green;
+        height: 150px;
+      }
+      .el--4 {
+        background-color: goldenrod;
+      }
+      .el--5 {
+        background-color: palevioletred;
+      }
+      .el--6 {
+        background-color: steelblue;
+      }
+      .el--7 {
+        background-color: yellow;
+      }
+      .el--8 {
+        background-color: crimson;
+      }
+
+      .container--1 {
+        /* STARTER */
+        font-family: sans-serif;
+        background-color: #ddd;
+        font-size: 30px;
+        margin: 40px;
+
+        /* CSS GRID */
+        display: grid;
+
+        /* 固定数值尺寸，不会随网页的尺寸变化 */
+        /* fraction尺寸(fr), 将会根据数值倍数关系自动分配剩余空间 */
+        /* auto: 自适应宽度，剩余空间由其他元素根据固定数值或fr分配 */
+        /* repeat(3, 1fr): 相当于 1fr 1fr 1fr, 8个元素分三列，将自动划分为三行，
+        但grid-template-rows只指定了两行的高度，剩余最后一行被称为implicit rows，
+        其高度根据内容自适应 */
+        /* grid-template-columns: 200px 200px 1fr 2fr; */
+        /* grid-template-columns: 1fr 1fr 1fr auto; */
+        grid-template-columns: repeat(4, 1fr);
+        /* grid-template-rows: 300px 100px; */
+        grid-template-rows: 1fr 1fr;
+        /* height: 500px; */
+
+        /* gap: 30px; */
+        column-gap: 20px;
+        row-gap: 40px;
+
+        /* TEMP not display on the web page*/
+        display: none;
+      }
+
+      /* 右击网页点击inspect, 在Elements中点击对应的grid，将弹出切分grid cells的行
+      和列序号，使用固定的行和列序号可以使grid-item占用指定的grid cell，一对数值分别代
+      表起如序号和终止序号，一个grid item可以占用多个cells*/
+      .el--8 {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+        /* 占用两列，也可以 1/3 */
+        /* grid-row: 1 / span 2; */
+      }
+
+      .el--2 {
+        /* 1/3 the same of 1/span 2, -1代表最后行/列序号 */
+        /* grid-column: 1 / 3; */
+        grid-column: 1 / -1;
+
+        /* 2/-1 is the same of 2/3 in this example, -1代表至最后*/
+        /* grid-row: 2 / -1; */
+        grid-row: 2 / 3;
+      }
+
+      /* 序号可以比实际最大序号(行序号3)还大，将创建implicit cells */
+      /* .el--6 {
+        grid-column: 4 / 5;
+        grid-row: 2 / 5;
+      } */
+
+      .container--2 {
+        /* STARTER */
+        font-family: sans-serif;
+        background-color: black;
+        font-size: 40px;
+        margin: 40px;
+
+        width: 700px;
+        height: 600px;
+
+        /* CSS GRID */
+        display: grid;
+        grid-template-columns: 125px 200px 125px;
+        grid-template-rows: 250px 100px;
+        gap: 50px;
+
+        /* Aligning tracks inside container: distribute empty space */
+        /* justify-content use for horizontal, align-content use for
+        vertical */
+        justify-content: center;
+        /* justify-content: space-between; */
+        align-content: center;
+        /* align-content: end; */
+
+        /* Aligning items INSIDE cells: moving items around inside cells */
+        /* justify-items: center; */
+        justify-items: end;
+        /* align-items: center; */
+        align-items: end;
+      }
+
+      .el--3 {
+        align-self: center;
+        justify-self: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container--1">
+      <div class="el el--1">(1) HTML</div>
+      <div class="el el--2">(2) and</div>
+      <div class="el el--3">(3) CSS</div>
+      <div class="el el--4">(4) are</div>
+      <div class="el el--5">(5) amazing</div>
+      <div class="el el--6">(6) languages</div>
+      <!-- <div class="el el--7">(7) to</div> -->
+      <div class="el el--8">(8) learn</div>
+    </div>
+
+    <div class="container--2">
+      <div class="el el--1">(1)</div>
+      <div class="el el--3">(3)</div>
+      <div class="el el--4">(4)</div>
+      <div class="el el--5">(5)</div>
+      <div class="el el--6">(6)</div>
+      <div class="el el--7">(7)</div>
+    </div>
+  </body>
+</html>
